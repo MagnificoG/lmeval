@@ -153,16 +153,15 @@ The script outputs a single JSON file containing a list of result objects. Each 
 
 ```json
 {
-    "task_id": "task_01", // Unique ID from the input Excel file
-    "provider_identifier": "DeepSeek__deepseek-chat", // Combined provider_name__model_name
-    "provider_name": "DeepSeek", // Name given in LLMProvider config
-    "model_name": "deepseek-chat", // Model name from LLMProvider config
-    "llm_response": ["A", "C"], // The actual response from the LLM, parsed into Python type (list, bool, str, number, or None)
-    "ground_truth": ["A", "C"], // The ground truth answer, parsed into Python type
-    "is_correct": true, // Boolean indicating if the llm_response matched ground_truth (or null if ground_truth was None)
-    "task_instruction": "Choose all correct options keys.", // Copied from input for context
-    "task_question": "Which letters are vowels?" // Copied from input for context
-    // Optional: "full_task_data": { ... original transformed task dict ... }
+    "task_id": "task_01",
+    "provider_identifier": "DeepSeek__deepseek-chat",
+    "provider_name": "DeepSeek",
+    "model_name": "deepseek-chat",
+    "llm_response": ["A", "C"],
+    "ground_truth": ["A", "C"],
+    "is_correct": true,
+    "task_instruction": "Choose all correct options keys.",
+    "task_question": "Which letters are vowels?"
 }
 ```
 
