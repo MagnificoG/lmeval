@@ -176,23 +176,3 @@ The code is structured into several classes to promote modularity:
 *   `LLMProvider`: Encapsulates configuration (name, model, credentials) and holds an `AsyncLLMClient` instance for a specific provider.
 *   `Evaluator`: Contains the logic for comparing LLM responses to ground truth answers based on type.
 *   `EvaluationRunner`: Orchestrates the entire process – loading, transforming, dispatching async API calls, evaluating, handling resumption, and saving results.
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit pull requests or open issues for bugs, feature requests, or improvements.
-
-## License
-
-This project is licensed under the MIT License. See the `LICENSE` file for details (or add your chosen license).
-
-**Next Steps:**
-
-1.  **Save:** Save this content as `README.md` in the root directory of your project.
-2.  **Customize:**
-    *   Replace `<your-repository-url>` and `<repository-directory>` placeholders.
-    *   Update the Python version requirement if needed.
-    *   Change the default script filename (`evaluation_script.py`) if yours is different.
-    *   Adjust the default Excel filename (`llm_eval_tasks_async.xlsx`) if necessary.
-    *   Add a `LICENSE` file if you haven't already, or specify your chosen license clearly.
-    *   Review the configuration section to ensure it accurately reflects how users should set up providers in your specific script layout.
-3.  **Create `requirements.txt`:** Make sure the `requirements.txt` file exists with the specified content.
