@@ -33,17 +33,10 @@ This project provides a Python framework for evaluating Large Language Models (L
 
 1.  **Clone the repository:**
     ```bash
-    git clone <your-repository-url>
-    cd <repository-directory>
+    git clone https://github.com/MagnificoG/lmeval.git
+    cd ./lmeval
     ```
-
-2.  **Create a virtual environment (recommended):**
-    ```bash
-    python -m venv venv
-    source venv/bin/activate  # On Windows use `venv\Scripts\activate`
-    ```
-
-3.  **Install dependencies:**
+2.  **Install dependencies and run:**
     Create a `requirements.txt` file with the following content:
     ```txt
     pandas>=1.3
@@ -54,6 +47,10 @@ This project provides a Python framework for evaluating Large Language Models (L
     Then run:
     ```bash
     pip install -r requirements.txt
+    ```
+    Alternatively, you can use `uv` to manage dependencies which is more convenient. If you have `uv` installed, run:
+    ```bash
+    uv run main.py
     ```
 
 ## Configuration
