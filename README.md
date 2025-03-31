@@ -37,7 +37,9 @@ This project provides a Python framework for evaluating Large Language Models (L
     cd ./lmeval
     ```
 2.  **Install dependencies and run:**
+
     - The traditional way
+
     Create a `requirements.txt` file with the following content:
     ```txt
     pandas>=1.3
@@ -49,7 +51,9 @@ This project provides a Python framework for evaluating Large Language Models (L
     ```bash
     pip install -r requirements.txt
     ```
+
     - With `uv` (recommended)
+    
     Alternatively, you can use `uv` to manage dependencies which is more convenient. If you have `uv` installed, run:
     ```bash
     uv run main.py
