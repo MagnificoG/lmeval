@@ -17,3 +17,7 @@ wheels/
 
 # logs
 *.json
+
+# node and static files
+web/frontend/node_modules/
+web/staticfiles/
