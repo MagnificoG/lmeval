@@ -7,17 +7,10 @@
       </router-link>
     </div>
     
-    <el-form :model="taskForm" :rules="rules" ref="taskForm" label-width="120px" class="task-form">
+    <el-form :model="taskForm" :rules="rules" ref="taskForm" label-width="120px">
       <el-form-item label="任务名称" prop="name">
         <el-input v-model="taskForm.name" placeholder="评测_2025-04-01 14:22:03"></el-input>
         <div class="char-count">{{ taskForm.name.length }}/50</div>
-      </el-form-item>
-      
-      <el-form-item label="评测类型" prop="eval_type">
-        <el-radio-group v-model="taskForm.eval_type">
-          <el-radio label="single">单个评测</el-radio>
-          <el-radio label="comparison">对比评测</el-radio>
-        </el-radio-group>
       </el-form-item>
       
       <el-form-item label="选择模型" prop="models">
@@ -54,20 +47,12 @@
       <el-form-item>
         <el-button type="primary" @click="submitForm">开始评测</el-button>
         <el-button @click="resetForm">取消</el-button>
-        <el-button type="text">评测费用</el-button>
-        <el-switch v-model="taskForm.use_real_time" active-text="以实际发生为准"></el-switch>
-        <el-button type="text">计算详情</el-button>
+        <!-- 删除评测费用及其右侧开关和文字 -->
       </el-form-item>
     </el-form>
     
-    <!-- 修改对话框配置 -->
-    <el-dialog
-      title="选择模型"
-      v-model="modelDialogVisible"
-      width="60%"
-      :append-to-body="true"
-      :destroy-on-close="false"
-      :close-on-click-modal="false">
+    <!-- 模型选择对话框 -->
+    <el-dialog title="选择模型" v-model="modelDialogVisible" width="60%">
       <div class="model-selection-tabs">
         <el-tabs v-model="activeTab">
           <el-tab-pane label="官方模型" name="official">
@@ -96,17 +81,15 @@
               </div>
             </div>
           </el-tab-pane>
-          <el-tab-pane label="我的模型" name="my">
-            <!-- 用户自定义模型内容 -->
-          </el-tab-pane>
         </el-tabs>
       </div>
       
-      <div class="dialog-footer">
-        <div class="selected-count">已选{{ getSelectedModelsCount() }}/20</div>
-        <el-button @click="modelDialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="confirmModelSelection">确认</el-button>
-      </div>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="modelDialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="confirmModelSelection">确定</el-button>
+        </span>
+      </template>
     </el-dialog>
   </div>
 </template>
@@ -120,19 +103,15 @@ export default {
     return {
       taskForm: {
         name: '',
-        eval_type: 'single',
+        eval_type: 'comparison', // 添加默认值，即使界面上不显示
         models: [],
         excel_file: null,
         dimension_template: '',
-        use_real_time: true
       },
       rules: {
         name: [
           { required: true, message: '请输入任务名称', trigger: 'blur' },
           { max: 50, message: '任务名称不能超过50个字符', trigger: 'blur' }
-        ],
-        eval_type: [
-          { required: true, message: '请选择评测类型', trigger: 'change' }
         ],
         models: [
           { required: true, message: '请选择至少一个模型', trigger: 'change' }
@@ -171,21 +150,29 @@ export default {
   methods: {
     generateDefaultTaskName() {
       const now = new Date();
-      const formattedDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-      const formattedTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
-      this.taskForm.name = `评测_${formattedDate} ${formattedTime}`;
+      const dateStr = now.toISOString().slice(0, 19).replace('T', ' ').replace(/-/g, '-');
+      this.taskForm.name = `评测_${dateStr}`;
     },
     async fetchProviders() {
       try {
-        const response = await axios.get('/api/models/');
-        this.providers = response.data;
-        // 初始化selected属性
-        this.providers.forEach(provider => {
-          provider.models.forEach(model => {
-            model.provider_name = provider.name;
-            model.selected = false;
-          });
-        });
+        // 模拟API调用，实际应用中应从后端获取
+        this.providers = [
+          {
+            name: '通义千问',
+            models: [
+              { id: 1, name: 'qwen-turbo', description: '通义千问-极速版', selected: false },
+              { id: 2, name: 'qwen-plus', description: '通义千问-增强版', selected: false },
+              { id: 3, name: 'qwen-max', description: '通义千问-专业版', selected: false }
+            ]
+          },
+          {
+            name: 'DeepSeek',
+            models: [
+              { id: 4, name: 'deepseek-chat', description: 'DeepSeek对话模型', selected: false },
+              { id: 5, name: 'deepseek-coder', description: 'DeepSeek编程模型', selected: false }
+            ]
+          }
+        ];
       } catch (error) {
         console.error('获取模型提供商失败:', error);
         this.$message.error('获取模型提供商失败');
@@ -194,18 +181,9 @@ export default {
     showModelSelectionDialog() {
       this.modelDialogVisible = true;
     },
-    getSelectedModelsCount() {
-      let count = 0;
-      this.providers.forEach(provider => {
-        provider.models.forEach(model => {
-          if (model.selected) count++;
-        });
-      });
-      return count;
-    },
     isModelSelectionDisabled(model) {
-      // 如果已经选择了20个模型，且当前模型未选中，则禁用
-      return this.getSelectedModelsCount() >= 20 && !model.selected;
+      // 对比评测至少需要选择两个模型
+      return false;
     },
     confirmModelSelection() {
       this.selectedModels = [];
@@ -214,41 +192,42 @@ export default {
           if (model.selected) {
             this.selectedModels.push({
               id: model.id,
-              name: model.name,
-              provider_name: provider.name
+              provider_name: provider.name,
+              name: model.name
             });
           }
         });
       });
       
-      // 更新表单中的模型数据
       this.taskForm.models = this.selectedModels.map(model => ({
         provider_name: model.provider_name,
-        model_name: model.name,
-        api_key: 'dummy-key', // 实际应用中应从安全存储获取或让用户输入
-        base_url: null
+        model_name: model.name
       }));
       
       this.modelDialogVisible = false;
     },
     removeModel(model) {
-      // 从已选模型中移除
       this.selectedModels = this.selectedModels.filter(m => m.id !== model.id);
-      
-      // 更新表单中的模型数据
       this.taskForm.models = this.taskForm.models.filter(m => 
         !(m.provider_name === model.provider_name && m.model_name === model.name)
       );
       
-      // 更新模型选择状态
+      // 更新选择状态
       this.providers.forEach(provider => {
         if (provider.name === model.provider_name) {
-          const targetModel = provider.models.find(m => m.id === model.id);
+          const targetModel = provider.models.find(m => m.name === model.name);
           if (targetModel) {
             targetModel.selected = false;
           }
         }
       });
+    },
+    handleUploadSuccess(response, file) {
+      this.taskForm.excel_file = response.file_path;
+      this.$message.success('文件上传成功');
+    },
+    handleUploadError() {
+      this.$message.error('文件上传失败');
     },
     beforeUpload(file) {
       const isExcel = file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' || 
@@ -259,41 +238,14 @@ export default {
       }
       return true;
     },
-    handleUploadSuccess(response, file) {
-      this.taskForm.excel_file = response.file_path;
-      this.$message.success('文件上传成功');
-    },
-    handleUploadError(err) {
-      this.$message.error('文件上传失败');
-      console.error('上传错误:', err);
-    },
-    // 修改提交表单方法，成功后导航回主页
     submitForm() {
       this.$refs.taskForm.validate(async (valid) => {
         if (valid) {
           try {
-            // 创建FormData对象用于文件上传
-            const formData = new FormData();
-            formData.append('name', this.taskForm.name);
-            formData.append('eval_type', this.taskForm.eval_type);
-            
-            // 添加模型数据
-            formData.append('models', JSON.stringify(this.taskForm.models));
-            
-            // 添加Excel文件
-            if (this.taskForm.excel_file) {
-              formData.append('excel_file', this.taskForm.excel_file);
-            }
-            
-            // 发送请求创建任务
-            const response = await axios.post('/api/tasks/', formData, {
-              headers: {
-                'Content-Type': 'multipart/form-data'
-              }
-            });
-            
-            this.$emit('task-created', response.data);
-            this.resetForm();
+            // 实际应用中应发送到后端API
+            console.log('提交的表单数据:', this.taskForm);
+            this.$message.success('任务创建成功');
+            this.$router.push('/');
           } catch (error) {
             console.error('创建任务失败:', error);
             this.$message.error('创建任务失败: ' + (error.response?.data?.message || error.message));
@@ -307,27 +259,19 @@ export default {
     resetForm() {
       this.$refs.taskForm.resetFields();
       this.selectedModels = [];
-      this.fileList = [];
-      this.generateDefaultTaskName();
-      
-      // 重置模型选择状态
       this.providers.forEach(provider => {
         provider.models.forEach(model => {
           model.selected = false;
         });
       });
+      this.fileList = [];
+      this.generateDefaultTaskName();
     }
   }
 }
 </script>
 
-<style>
-/* 添加全局样式确保Element Plus组件正确显示 */
-@import 'element-plus/dist/index.css';
-</style>
-
 <style scoped>
-/* 增强容器样式 */
 .create-task-container {
   max-width: 1200px;
   margin: 0 auto;
@@ -346,68 +290,59 @@ export default {
   border-bottom: 1px solid #ebeef5;
 }
 
-.task-form {
-  padding: 20px;
-}
-
-/* 保留原有样式 */
 .char-count {
   text-align: right;
   color: #999;
   font-size: 12px;
 }
+
 .selected-models {
   margin-top: 10px;
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
 }
+
 .model-count {
   margin-top: 5px;
+  color: #999;
   font-size: 12px;
-  color: #666;
 }
+
 .upload-hint, .template-hint {
   margin-top: 5px;
+  color: #999;
   font-size: 12px;
-  color: #666;
-  line-height: 1.4;
 }
-.model-selection-tabs {
+
+.provider-filter {
   margin-bottom: 20px;
 }
-.provider-filter {
-  margin-bottom: 15px;
-}
+
 .model-count-info {
   margin-bottom: 15px;
   color: #666;
 }
+
 .model-category {
   margin-bottom: 20px;
 }
+
 .model-items {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 15px;
 }
+
 .model-item {
   padding: 10px;
-  border: 1px solid #eee;
+  border: 1px solid #ebeef5;
   border-radius: 4px;
 }
+
 .model-description {
   margin-top: 5px;
+  color: #999;
   font-size: 12px;
-  color: #666;
-}
-.dialog-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 20px;
-}
-.selected-count {
-  color: #666;
 }
 </style>

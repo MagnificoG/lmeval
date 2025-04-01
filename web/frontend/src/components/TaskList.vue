@@ -1,7 +1,17 @@
 <template>
   <div class="task-list-container">
     <div class="header-actions">
-      <h2>任务列表</h2>
+      <div class="left-actions">
+        <h2>任务列表</h2>
+        <!-- 将圆形按钮改为刷新按钮 -->
+        <el-button 
+          circle 
+          icon="Refresh" 
+          @click="fetchTasks" 
+          :loading="loading"
+          title="刷新任务列表">
+        </el-button>
+      </div>
       <router-link to="/create-task">
         <el-button type="primary">创建评测任务</el-button>
       </router-link>
@@ -172,13 +182,27 @@ export default {
 
 <style scoped>
 .task-list-container {
+  max-width: 1200px;
+  margin: 0 auto;
   padding: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
 }
+
 .header-actions {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #ebeef5;
+}
+
+.left-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 .actions {
   display: flex;
