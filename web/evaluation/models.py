@@ -53,3 +53,57 @@ class EvaluationResult(models.Model):
     
     def get_result_data(self):
         return json.loads(self.result_data) if self.result_data else {}
+
+
+from django.db import models
+
+class Dataset(models.Model):
+    """数据集模型"""
+    DATASET_TYPES = (
+        ('text_generation', '评测集-文本生成'),
+        ('code_generation', '评测集-代码生成'),
+    )
+    
+    IMPORT_STATUS = (
+        ('pending', '等待中'),
+        ('processing', '导入中'),
+        ('success', '导入成功'),
+        ('failed', '导入失败'),
+    )
+    
+    PUBLISH_STATUS = (
+        ('draft', '草稿'),
+        ('published', '已发布'),
+    )
+    
+    name = models.CharField(max_length=100, verbose_name='数据集名称')
+    type = models.CharField(max_length=20, choices=DATASET_TYPES, verbose_name='数据集类型')
+    version = models.CharField(max_length=20, verbose_name='版本')
+    count = models.IntegerField(default=0, verbose_name='数据量')
+    import_status = models.CharField(max_length=20, choices=IMPORT_STATUS, default='pending', verbose_name='导入状态')
+    publish_status = models.CharField(max_length=20, choices=PUBLISH_STATUS, default='draft', verbose_name='发布状态')
+    description = models.TextField(blank=True, verbose_name='描述')
+    file_path = models.CharField(max_length=255, blank=True, verbose_name='文件路径')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
+    updated_at = models.DateTimeField(auto_now=True, verbose_name='更新时间')
+    
+    class Meta:
+        verbose_name = '数据集'
+        verbose_name_plural = '数据集'
+        ordering = ['-updated_at']
+    
+    def __str__(self):
+        return f"{self.name} ({self.version})"
+
+class DatasetItem(models.Model):
+    """数据集项目"""
+    dataset = models.ForeignKey(Dataset, on_delete=models.CASCADE, related_name='items', verbose_name='所属数据集')
+    question = models.TextField(verbose_name='问题')
+    answer = models.TextField(verbose_name='标准答案')
+    
+    class Meta:
+        verbose_name = '数据集项目'
+        verbose_name_plural = '数据集项目'
+    
+    def __str__(self):
+        return f"{self.dataset.name} - Item {self.id}"

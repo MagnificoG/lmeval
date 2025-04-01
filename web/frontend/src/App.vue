@@ -9,6 +9,7 @@
           <el-menu mode="horizontal" :router="true" :default-active="activeMenu">
             <el-menu-item index="/">首页</el-menu-item>
             <el-menu-item index="/tasks">评测任务</el-menu-item>
+            <el-menu-item index="/datasets">数据集管理</el-menu-item>
           </el-menu>
           <div class="user-info">
             <el-dropdown>
