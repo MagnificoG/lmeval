@@ -55,7 +55,7 @@
     <el-dialog title="选择模型" v-model="modelDialogVisible" width="60%">
       <div class="model-selection-tabs">
         <el-tabs v-model="activeTab">
-          <el-tab-pane label="内置模型" name="provided">
+          <el-tab-pane label="内置模型" name="official">
             <div class="provider-filter">
               <el-radio-group v-model="selectedProvider">
                 <el-radio-button label="all">全部</el-radio-button>
