@@ -1,0 +1,1 @@
+uv run web/manage.py runserver
