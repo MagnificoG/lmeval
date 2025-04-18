@@ -118,30 +118,6 @@ class EvaluationTaskViewSet(viewsets.ModelViewSet):
             task.save()
             print(f"评测任务 {task.id} 失败: {str(e)}")
 
-class ModelProviderViewSet(viewsets.ViewSet):
-    """提供可用的模型提供商和模型列表"""
-    
-    def list(self, request):
-        # 这里可以从配置文件或数据库中获取支持的模型列表
-        providers = [
-            {
-                "name": "通义千问",
-                "models": [
-                    {"id": "tongyi-qianwen-Max", "name": "通义千问-Max", "description": "通义千问2.5系列千亿级别超大规模语言模型，支持中文、英文等不同语言输入。"},
-                    {"id": "tongyi-qianwen-Plus", "name": "通义千问-Plus", "description": "通义千问超大规模语言模型的增强版，支持中文英文等不同语言输入。"},
-                    {"id": "tongyi-qianwen-Turbo", "name": "通义千问-Turbo", "description": "通义千问超大规模语言模型，支持中文英文等不同语言输入。"},
-                    {"id": "tongyi-qianwen-Max-Latest", "name": "通义千问-Max-Latest", "description": "通义千问最新版本"}
-                ]
-            },
-            {
-                "name": "DeepSeek",
-                "models": [
-                    {"id": "deepseek-chat", "name": "DeepSeek Chat", "description": "DeepSeek对话模型"}
-                ]
-            }
-        ]
-        return Response(providers)
-
 # 在现有views.py文件中添加以下内容
 
 from django.views.generic import TemplateView
@@ -278,30 +254,6 @@ class EvaluationTaskViewSet(viewsets.ModelViewSet):
             task.status = 'failed'
             task.save()
             print(f"评测任务 {task.id} 失败: {str(e)}")
-
-class ModelProviderViewSet(viewsets.ViewSet):
-    """提供可用的模型提供商和模型列表"""
-    
-    def list(self, request):
-        # 这里可以从配置文件或数据库中获取支持的模型列表
-        providers = [
-            {
-                "name": "通义千问",
-                "models": [
-                    {"id": "tongyi-qianwen-Max", "name": "通义千问-Max", "description": "通义千问2.5系列千亿级别超大规模语言模型，支持中文、英文等不同语言输入。"},
-                    {"id": "tongyi-qianwen-Plus", "name": "通义千问-Plus", "description": "通义千问超大规模语言模型的增强版，支持中文英文等不同语言输入。"},
-                    {"id": "tongyi-qianwen-Turbo", "name": "通义千问-Turbo", "description": "通义千问超大规模语言模型，支持中文英文等不同语言输入。"},
-                    {"id": "tongyi-qianwen-Max-Latest", "name": "通义千问-Max-Latest", "description": "通义千问最新版本"}
-                ]
-            },
-            {
-                "name": "DeepSeek",
-                "models": [
-                    {"id": "deepseek-chat", "name": "DeepSeek Chat", "description": "DeepSeek对话模型"}
-                ]
-            }
-        ]
-        return Response(providers)
 
 # 在现有views.py文件中添加以下内容
 
@@ -604,12 +556,6 @@ def result_details(request, task_id, result_id):
         }
     ]
     return Response(details)
-
-@api_view(['POST'])
-def upload_file(request):
-    """上传文件"""
-    # 实现上传文件的逻辑
-    return Response({'file_path': 'uploads/example.xlsx'})
 
 # 数据集管理相关视图
 @api_view(['GET', 'POST'])
